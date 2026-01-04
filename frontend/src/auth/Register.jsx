@@ -1,28 +1,49 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../api/axios';
-import { Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { register } from '../api/axios';
+import { Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
 import '../styles/auth.css';
 
-const Login = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Register = ({ onRegisterSuccess }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await login(email, password);
+      const res = await register(formData.email, formData.password);
       localStorage.setItem('token', res.data.access_token);
-      onLoginSuccess();
+      if (onRegisterSuccess) onRegisterSuccess();
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,32 +59,30 @@ const Login = ({ onLoginSuccess }) => {
 
       <div className="auth-content">
         <div className="auth-card fade-in">
-          {/* Logo & Title */}
           <div className="auth-header">
             <div className="auth-logo">
               <Sparkles size={32} />
             </div>
-            <h1 className="auth-title">Welcome Back</h1>
-            <p className="auth-subtitle">Sign in to continue to your workspace</p>
+            <h1 className="auth-title">Create Account</h1>
+            <p className="auth-subtitle">Start your productivity journey today</p>
           </div>
 
-          {/* Error Alert */}
           {error && (
             <div className="alert alert-error">
               {error}
             </div>
           )}
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="auth-form">
+          <form onSubmit={handleRegister} className="auth-form">
             <div className="input-group">
               <label className="input-label">Email Address</label>
               <div className="input-with-icon">
                 <Mail size={20} className="input-icon" />
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
                   className="input"
                   required
@@ -78,12 +97,30 @@ const Login = ({ onLoginSuccess }) => {
                 <Lock size={20} className="input-icon" />
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                   className="input"
                   required
-                  autoComplete="current-password"
+                  autoComplete="new-password"
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Confirm Password</label>
+              <div className="input-with-icon">
+                <Lock size={20} className="input-icon" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="input"
+                  required
+                  autoComplete="new-password"
                 />
               </div>
             </div>
@@ -96,46 +133,44 @@ const Login = ({ onLoginSuccess }) => {
               {loading ? (
                 <>
                   <span className="spinner"></span>
-                  Signing in...
+                  Creating account...
                 </>
               ) : (
                 <>
-                  Sign In
+                  Create Account
                   <ArrowRight size={20} />
                 </>
               )}
             </button>
           </form>
 
-          {/* Register Link */}
           <div className="auth-footer">
             <p className="text-sm text-muted">
-              Don't have an account?{' '}
-              <Link to="/register" className="auth-link">
-                Create one now
+              Already have an account?{' '}
+              <Link to="/login" className="auth-link">
+                Sign in instead
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Side Info */}
         <div className="auth-side-info fade-in">
-          <h2 className="side-info-title">Boost Your Productivity</h2>
+          <h2 className="side-info-title">Join Thousands of Productive Users</h2>
           <p className="side-info-text">
-            Manage your tasks, schedule with AI, and integrate seamlessly with Google Calendar.
+            Experience the future of task management with AI-powered scheduling and seamless integrations.
           </p>
           <div className="side-info-features">
             <div className="feature-item">
               <div className="feature-icon">✓</div>
-              <span>AI-Powered Task Scheduling</span>
+              <span>Free to get started</span>
             </div>
             <div className="feature-item">
               <div className="feature-icon">✓</div>
-              <span>Google Calendar Integration</span>
+              <span>No credit card required</span>
             </div>
             <div className="feature-item">
               <div className="feature-icon">✓</div>
-              <span>Smart Task Management</span>
+              <span>Cancel anytime</span>
             </div>
           </div>
         </div>
@@ -144,4 +179,4 @@ const Login = ({ onLoginSuccess }) => {
   );
 };
 
-export default Login;
+export default Register;

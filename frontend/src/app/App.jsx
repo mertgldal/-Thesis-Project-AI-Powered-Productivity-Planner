@@ -2,48 +2,68 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import Dashboard from '../pages/Dashboard';
+import ProfilePage from '../pages/ProfilePage';
 import GoogleCallback from '../features/calendar/GoogleCallback.jsx';
+import Register from '../auth/Register';
+import '../styles/modern.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem('token')
   );
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('token');
+  };
+
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 text-gray-900 font-sans">
-        <header className="p-4 bg-blue-600 text-white shadow-md flex justify-between">
-          <h1 className="text-xl font-bold">Thesis Productivity Planner</h1>
-        </header>
+      <Routes>
+        {/* Auth Routes */}
+        <Route 
+          path="/login"
+          element={
+            isAuthenticated 
+              ? <Navigate to="/dashboard" /> 
+              : <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+          }
+        />
+        
+        <Route 
+          path="/register"
+          element={
+            isAuthenticated 
+              ? <Navigate to="/dashboard" /> 
+              : <Register onRegisterSuccess={() => setIsAuthenticated(true)} />
+          }
+        />
 
-        <main className="p-4">
-          <Routes>
-            <Route 
-                path="/login"
-                element={
-                    isAuthenticated 
-                    ? <Navigate to="/dashboard" /> 
-                    : <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
-                }
-            />
-            
-            <Route 
-                path="/dashboard"
-                element={
-                    isAuthenticated
-                    ? <Dashboard onLogout={() => setIsAuthenticated(false)} />
-                    : <Navigate to="/login" />
-                }
-            />
+        {/* Protected Routes */}
+        <Route 
+          path="/dashboard"
+          element={
+            isAuthenticated
+              ? <Dashboard onLogout={handleLogout} />
+              : <Navigate to="/login" />
+          }
+        />
 
-            {/* Google OAuth Callback Route */}
-            <Route path="/google-callback" element={<GoogleCallback />} />
-            
-            {/* Default redirect */}
-            <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
-          </Routes>
-        </main>
-      </div>
+        <Route 
+          path="/profile"
+          element={
+            isAuthenticated
+              ? <ProfilePage onLogout={handleLogout} />
+              : <Navigate to="/login" />
+          }
+        />
+
+        {/* Google OAuth Callback Route */}
+        <Route path="/google-callback" element={<GoogleCallback />} />
+        
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+      </Routes>
     </Router>
   );
 }

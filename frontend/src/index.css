@@ -1,12 +1,106 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Modern ThesisPlanner - Main Styles */
+@import './styles/modern.css';
+@import './styles/auth.css';
+@import './styles/navbar.css';
+@import './styles/dashboard.css';
+@import './styles/profile.css';
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  /* --- NOTION CORE PALETTE --- */
+  --bg-main: #FFFFFF;           /* Main canvas */
+  --bg-sidebar: #F7F7F5;        /* Subtle off-white sidebar */
+  --bg-hover: #EFEFEF;          /* Hover state for items */
+  --text-primary: #37352F;      /* Warm charcoal (not dead black) */
+  --text-secondary: #9B9A97;    /* Muted gray for meta-data */
+  --border-subtle: #E0E0E0;     /* Very light borders */
+  --border-strong: #D3D3D3;     /* slightly stronger borders */
+
+  /* --- ACCENTS & STATUS --- */
+  --accent-primary: #EA4E43;    /* The Notion Red/Orange brand color */
+  /* Event Colors - Soft pastel backgrounds with darker text */
+  --event-blue-bg: #E3F2FD; --event-blue-text: #1565C0;
+  --event-green-bg: #E8F5E9; --event-green-text: #2E7D32;
+  --event-red-bg: #FFEBEE; --event-red-text: #C62828;
+  
+  /* --- UI DENSITY --- */
+  --sidebar-width: 320px;
 }
+
+/* --- GLOBAL RESETS --- */
+* { box-sizing: border-box; }
+body, html {
+  margin: 0; padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100%; /* Allow page sections to extend and scroll */
+  overflow-y: auto;
+}
+
+#root { min-height: 100%; }
+
+/* --- UTILITY CLASSES --- */
+/* A clean, minimalist input style */
+.notion-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: transparent;
+  transition: border 0.1s, background 0.1s;
+}
+.notion-input:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  background: white;
+}
+.notion-input::placeholder { color: #D3D3D3; }
+
+/* Subtle buttons */
+.btn-icon {
+  padding: 6px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex; alignItems: center; justify-content: center;
+  transition: background 0.1s;
+}
+.btn-icon:hover { background-color: var(--bg-hover); color: var(--text-primary); }
+
+.btn-primary-solid {
+  background: var(--text-primary); color: white;
+  padding: 8px 12px; border-radius: 4px; font-weight: 500; font-size: 0.9rem;
+  transition: opacity 0.1s;
+}
+.btn-primary-solid:hover { opacity: 0.9; }
+
+
+/* --- CALENDAR OVERRIDES (Making react-big-calendar look like Notion) --- */
+.rbc-calendar { font-family: 'Inter', sans-serif; color: var(--text-primary); }
+.rbc-header {
+  padding: 12px 0; font-weight: 600; font-size: 0.85rem;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+.rbc-month-view, .rbc-time-view, .rbc-agenda-view { border: none !important; }
+.rbc-day-bg + .rbc-day-bg { border-left: 1px solid var(--border-subtle) !important; }
+.rbc-month-row { border-bottom: 1px solid var(--border-subtle) !important; }
+.rbc-off-range-bg { background: var(--bg-sidebar) !important; }
+.rbc-today { background: transparent !important; }
+.rbc-current-time-indicator { background-color: var(--accent-primary) !important; height: 2px !important; }
+
+/* Event Styling */
+.rbc-event {
+  box-shadow: none !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+}
+/* Remove default blue background selection */
+.rbc-selected { background-color: transparent !important; }
+.rbc-event-label { display: none !important; } /* Hide times in month view for cleaner look */
